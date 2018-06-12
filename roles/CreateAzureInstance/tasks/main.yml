@@ -1,0 +1,68 @@
+- name: Create virtual network
+  azure_rm_virtualnetwork:
+    resource_group: "{{ resource_group }}"
+    name: VNET-Yale-SOM
+    address_prefixes: "10.6.132.0/22"
+
+- name: Add subnet
+  azure_rm_subnet:
+    resource_group: "{{ resource_group }}"
+    name: Subnet1
+    address_prefix: "10.6.132.0/24"
+    virtual_network: VNET-Yale-SOM
+
+- name: Create public IP address
+  azure_rm_publicipaddress:
+    resource_group: "{{ resource_group }}"
+    allocation_method: Static
+    name: myPublicIP
+  register: out
+- debug: var=out
+
+- name: Add created new instance to Ansible host group
+  add_host:
+    hostname: "{{ out.state.ip_address }}"
+    groupname: AzureVM
+  register: out
+- debug: var=out
+    
+#- name: Create Network Security Group that allows SSH
+#  azure_rm_securitygroup:
+#    resource_group: "{{ resource_group }}"
+#    name: Ansible-Test
+#    rules:
+#    - name: SSH
+#      protocol: Tcp
+#      destination_port_range: 22
+#      access: Allow
+#      priority: 1001
+#      direction: Inbound
+
+- name: Create virtual network inteface card
+  azure_rm_networkinterface:
+    resource_group: "{{ resource_group }}"
+    name: Ansible-Test123
+    virtual_network: VNET-Yale-SOM
+    subnet: Subnet1
+    public_ip_name: myPublicIP
+    security_group: VNET-Yale-SOM-RG
+
+- name: Create VM
+  azure_rm_virtualmachine:
+    resource_group: "{{ resource_group }}"
+    name: Ansible
+    vm_size: Standard_D1
+    network_interfaces: Ansible-Test123
+    admin_username: anirudh
+    ssh_password_enabled: false
+    ssh_public_keys:
+      - path: /home/anirudh/.ssh/authorized_keys
+        #Insert user public key below, from ~/.ssh/id_rsa.pub
+        key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwqfPmVekGimvfSZE+FxVDkolwhf7ktD0vp7v4PeQzn7OrQo5ziOYJ4n4rPbNVwDRGv6xHZqUxrQqTv6HqdC+lV+l8sNGlSN7/O3mH7Jinzvz9ctdmAjlIJk+5D0HFhKzSAj5SoKlKX54N1k9Gd9XNQJPmdxPE78x/m8jJkZkeqhakLjA+jbcn3l2LEp6sAbTKH0b7z235nDuGGYNhn0dVUP8gdCS7I3hlAogpuQFlNXSIst8EIia76uE7klvPrDOfjLh8WQ7DMpgxTOnDlYns8lEC7uQ4QGxoNJqoNcXPqIYSWmzhv5utrn/WLdeymNCmWDHqny9FiSzxwwSqELW7 ec2-user@ip-172-31-6-152.sa-east-1.compute.internal"
+    image:
+      offer: UbuntuServer
+      publisher: Canonical
+      sku: '16.04-LTS'
+      version: latest
+
+

@@ -1,0 +1,8 @@
+---
+Environment: "Azure"
+ReqSetup: ""
+home_folder: "/home/anirudh"
+resource_group: "myResourceGroup"
+config.env: "config.env"
+githubuser: 
+githubpassword: 

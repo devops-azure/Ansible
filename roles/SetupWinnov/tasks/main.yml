@@ -1,0 +1,19 @@
+- name: Clone Winnov repository into home directory
+  git:
+    repo: https://{{ githubuser | urlencode }}:{{ githubpassword | urlencode }}@github.com/yalesom/winnov_csv_generator.git
+    version: master
+    dest: "{{home_folder/winnov_csv_generator}}"
+    accept_hostkey: yes
+
+- name: Copy config.env file to env directory
+  copy:
+   src: ./Downloads/{{item}}
+   dest: "{{home_folder/winnov_csv_generator/env}}"
+  with_items:
+   - "{{config.env}}"
+
+- name: Install Winnov
+  shell: docker-compose up -d
+  args:
+    chdir: "{{home_folder/winnov_csv_generator}}"
+

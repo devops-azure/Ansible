@@ -1,0 +1,27 @@
+- name: Install prerequisites
+  apt:
+    name={{item}}
+    update_cache=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - software-properties-common
+
+- name: Add Docker GPG key
+  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+
+- name: Add Docker APT repository
+  apt_repository:
+   repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+
+- name: Install Docker CE
+  apt: name=docker-ce
+
+- name: Install Docker compose
+  apt: name=docker-compose
+
+- name: Enable Docker systemd service
+  service:
+    name: docker
+    state: started
+    enabled: yes

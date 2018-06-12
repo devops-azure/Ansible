@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    #DownloadPath: "/tmp/env/"
+  roles:
+  - { role: CreateAzureInstance, ReqSetup=="AzureSetup" or when: ReqSetup=="CreateAzureInstance" }
+ 
+#ansible-playbook main.yml -i environments/Azure -f 5 -e Environment=Azure -e ReqSetup=AzureSetup --user anirudh --become
+#ansible-playbook main.yml -i environments/Azure -f 5 -e Environment=Azure -e ReqSetup=CreateAzureInstance
+ 
+- hosts: AzureVM
+  gather_facts: no
+  roles:
+  - { role: InstallDocker, when: ReqSetup=="AzureSetup" or ReqSetup=="Docker"}
+  - { role: SetupWinnov, when: ReqSetup=="AzureSetup" or ReqSetup=="Winnov" }
+
+#ansible-playbook main.yml -i environments/Azure -f 5 -e Environment=Azure -e ReqSetup=Docker --user anirudh --become 
+#ansible-playbook main.yml -i environments/Azure -f 5 -e Environment=Azure -e ReqSetup=Winnov --user anirudh --become
+
