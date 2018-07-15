@@ -1,0 +1,8 @@
+---
+Environment: "AWS"
+ReqSetup: ""
+home_folder: "/home/rajesh"
+resource_group: "myResourceGroup"
+
+githubuser: ""
+githubpassword: "" 

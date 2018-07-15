@@ -1,0 +1,18 @@
+---
+- name: Ansible hard copy file to remote server
+  copy:
+    src: /home/ubuntu/welcome
+    dest: /home/ubuntu/
+
+- name: Ansible soft copy file to remote server
+  copy:
+    src: /home/ubuntu/welcome
+    dest: /home/ubuntu/
+    force: no # Don't make changes if file alrdy present, only create if not present
+
+- name: Ansible copy file on remote server itself
+  copy:
+    src: /home/ubuntu/welcome
+    dest: /home/ubuntu/
+    remote_src: yes
+

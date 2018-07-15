@@ -1,0 +1,10 @@
+---
+- name: whoami 
+  command: whoami
+  register: output
+- debug: msg={{output}}
+
+- name: capture output of id command
+  command: id -un
+  register: login
+- debug: msg="Logged in as user {{ login.stdout }}"
