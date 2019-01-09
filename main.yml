@@ -10,7 +10,7 @@
  
 #ansible-playbook main.yml -i environments/Azure -f 5 -e Environment=Azure -e ReqSetup=AzureSetup --user anirudh --become
 #ansible-playbook main.yml -i environments/Azure -f 5 -e Environment=Azure -e ReqSetup=CreateAzureInstance
- 
+# 
 
 - hosts: WebServers
   gather_facts: yes
