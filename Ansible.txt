@@ -1,0 +1,117 @@
+Ansible is agentless
+
+Ansible host requires Python and Ansible
+Ansible end machine requires Python and ssh or winrm should be enabled and allowed for Ansible host
+
+---
+
+Ping:
+
+>ansible all -m ping
+
+>ansible Webservers -m ping 
+
+>ansible all -i <inventory> -m ping
+
+-----------------------------------------
+roles/Copy:
+
+--name: Copy a.txt file
+  copy: 
+  src: /home/a.txt
+  dest: /home/temp/a.txt
+
+If remote-side already there
+No
+else
+copy
+
+
+ansible-playbook --tags Copy -i inventory
+changed
+ansible-playbook --tags Copy -i inventory
+Ok
+ansible-playbook --tags Copy -i inventory
+Changed
+
+
+Idempotency
+Changed
+OK
+Success
+-------------------------------
+
+>ansible all -i <inventory> -m winrm_ping
+
+ansible all -i environments/QA/inventory -m winrm_ping -u ansibleuser --ask-pass
+Respose: PONG
+
+
+ansible-playbook --tags=deploy_DB
+401 A
+Credentials issues
+
+
+
+As no user mentioned, this command will ping the node or all the nodes added into hosts file using the same user from which ansible master is running.
+
+Check ssh and winrm connection:
+>ansible all -i <inventory> -m ping -u ansibleuser
+
+Paswd less authentication:
+This tries to login as ansibleuser, if not mentioned it wl try to login using server username only.
+and the jenkins or server user public key should be added into ansibleuser authorized_keys. If not throws error.
+
+Or
+Use password method:
+>ansible all -i <inventory> -m ping -u ansibleuser --ask-pass
+
+login as root:
+>ansible all -i <inventory> -m ping -u ansibleuser --become
+
+if ansibleuser has sudo permission then no error, if not you should provide sudo paswd of ansibleuser
+>ansible all -i <inventory> -m ping -u ansibleuser --become --ask-become-pass
+
+-------------------------------------------------------------------
+To know:
+
+Ansible roles, handlers, templates, environments, group_vars, ansible_vault
+
+
+-------------------------------------------------------------------
+
+Enable wirnm port for windows local user: 
+user: ansibleuser
+pwd: Welcome@1234
+
+If windows server has AD accounts, then a local user must be created for winrm connections, winrm doesnt work on AD users.
+Then, enalbe wirnm for the user, using:
+
+Set-ExecutionPolicy RemoteSigned -Force
+
+Set-item wsman:\localhost\Client\TrustedHosts -value '*' -Force 
+
+Set-NetFirewallRule -DisplayName 'Windows Remote Management (HTTP-In)' -RemoteAddress 'Any' 
+
+([adsi]"WinNT://./Administrator,user").SetPassword("Welcome@1234")
+
+winrm set winrm/config/client/auth '@{Basic="true"}'
+
+winrm set winrm/config/service/auth '@{Basic="true"}'
+
+winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+
+--------------------------------------------------------------------
+Ref:
+http://www.geedew.com/setting-up-ansible-for-multiple-environment-deployments/
+
+https://stackoverflow.com/questions/32526774/multistage-deployment-with-ansible
+
+https://github.com/ansible/ansible/issues/23762
+
+http://rosstuck.com/multistage-environments-with-ansible
+
+https://www.digitalocean.com/community/tutorials/how-to-manage-multistage-environments-with-ansible
+
+-----------------------------------------------------------------------
+
